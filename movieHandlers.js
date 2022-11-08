@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable radix */
 const database = require("./database");
 
 const movies = [
@@ -76,7 +78,30 @@ const getMovieById = (req, res) => {
 };
 */
 
+const postMovie = (req, res) => {
+  // console.log(req.body);
+  const { title, director, year, color, duration } = req.body;
+  database
+    .query(
+      "INSERT INTO movies(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
+      [title, director, year, color, duration]
+    )
+    .then(([result]) => {
+      console.log(result.insertId);
+      res
+        .location(`/api/movies/${result.insertId}`)
+        .sendStatus(201)
+        .send("Movie successefully inserted");
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error saving the movie");
+    });
+  // res.send("Post route is working");
+};
+
 module.exports = {
   getMovies,
   getMovieById,
+  postMovie,
 };

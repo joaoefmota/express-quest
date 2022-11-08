@@ -10,15 +10,27 @@ const welcome = (req, res) => {
   res.send('Welcome to my favourite movie list');
 };
 
+app.use(express.json());
+// MIDDLEWARE: software or function called between 2 pieces of software
+// An app using Express is nothing but a succession of middleware calls.
+// this express.json() vital to use for POST, as EXPRESS can not request bodies by default
+// to ensure that all our routes are able to read a JSON formatted request body.
+// *adicionamos a info no POSTMAN, que tem de ser match com a database, e clicamos em SEND.
+// *Não esquecer que tem de ser POST e, nas tabs, selecionar BODY. Dropdown menu: JSON
+
 app.get('/', welcome);
 
 const movieHandlers = require('./movieHandlers');
-const userHanders = require('./userHandlers');
 
 app.get('/api/movies', movieHandlers.getMovies);
 app.get('/api/movies/:id', movieHandlers.getMovieById);
-app.get('/api/users', userHanders.getUsers);
-app.get('/api/users/:id', userHanders.getUserById);
+app.post('/api/movies', movieHandlers.postMovie);
+
+const userHandlers = require('./userHandlers');
+
+app.get('/api/users', userHandlers.getUsers);
+app.get('/api/users/:id', userHandlers.getUserById);
+app.post('/api/users', userHandlers.postUser);
 
 app.listen(port, (err) => {
   if (err) {

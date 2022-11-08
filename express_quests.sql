@@ -111,3 +111,4 @@ VALUES
     'Milan',
     'Spanish'
   );
+  DELETE FROM movies WHERE id=8;

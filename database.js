@@ -31,7 +31,7 @@ database
   .query('SELECT * FROM movies')
   .then((result) => {
     const movies = result[0];
-    console.log(movies);
+    // console.log(movies);
   })
   .catch((err) => {
     console.error(err);
@@ -39,7 +39,7 @@ database
 
 database.query('SELECT * FROM users').then(([result]) => {
   const users = result;
-  console.log(users);
+  // console.log(users);
 });
 
 /*
