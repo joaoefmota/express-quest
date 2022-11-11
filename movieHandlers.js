@@ -78,6 +78,7 @@ const getMovieById = (req, res) => {
 };
 */
 
+// DON?T FORGET TO USE EXPRESS json in App! const express = require('express');
 const postMovie = (req, res) => {
   // console.log(req.body);
   const { title, director, year, color, duration } = req.body;

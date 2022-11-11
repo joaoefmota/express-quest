@@ -112,3 +112,4 @@ VALUES
     'Spanish'
   );
   DELETE FROM movies WHERE id=8;
+  DESCRIBE movies;
