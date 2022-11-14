@@ -4,10 +4,13 @@ const userSchema = Joi.object({
   email: Joi.string()
     .email()
     .max(255)
-    .pattern(RegExp(`^[a-z0-9._]+@[a-z0-9-]+\.[a-z]{2,3}$`))
+    .pattern(/^[a-z0-9._]+@[a-z0-9-]+.[a-z]{2,3}$/)
+    .trim()
     .required(),
   firstname: Joi.string().max(255).required(),
   lastname: Joi.string().max(255).required(),
+  city: Joi.string().max(255).required(),
+  language: Joi.string().max(255).required(),
 });
 
 const validateMovie = (req, res, next) => {
@@ -43,9 +46,9 @@ const validateMovie = (req, res, next) => {
 };
 
 const validateUser = (req, res, next) => {
-  const { firstname, lastname, email } = req.body;
+  const { firstname, lastname, email, city, language } = req.body;
   const { error } = userSchema.validate(
-    { firstname, lastname, email },
+    { firstname, lastname, email, city, language },
     { abortEarly: false },
   );
   if (error) {

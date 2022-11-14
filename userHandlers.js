@@ -5,16 +5,54 @@
 const database = require("./database");
 
 const getUsers = (req, res) => {
+  const initialSql = "SELECT * FROM users";
+  const where = [];
+  if (req.query.language != null) {
+    where.push({
+      column: "language",
+      value: req.query.language,
+      operator: "=",
+    });
+  }
+  if (req.query.city != null) {
+    where.push({
+      column: "city",
+      value: req.query.city,
+      operator: "=",
+    });
+  }
   database
-    .query("SELECT * FROM users")
+    .query(
+      where.reduce(
+        (sql, { column, operator }, index) => `${sql} ${index === 0 ? "WHERE" : "AND"} ${column} ${operator} ?`,
+        initialSql,
+      ),
+      where.map(({ value }) => value),
+    )
+
     .then(([users]) => {
       res.json(users);
     })
+
     .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error retriving data from database");
+      console.err(err);
+      res.status(500).send("Error retrieving data from database");
     });
 };
+
+/* ANTIGO ANTES DA QUEST6
+const getUsers = (req, res) => {
+database
+.query("SELECT * FROM users")
+.then(([users]) => {
+  res.json(users);
+})
+.catch((err) => {
+  console.error(err);
+  res.status(500).send("Error retriving data from database");
+});
+};
+*/
 
 const getUserById = (req, res) => {
   const id = parseInt(req.params.id);
@@ -41,11 +79,15 @@ const postUser = (req, res) => {
       [firstname, lastname, email, city, language]
     )
     .then(([result]) => {
-      res.location(`./api/users/${result.insertId}`).sendstatus(201);
+      res.location(`./api/users/${result.insertId}`).sendStatus(201);
     })
     .catch((err) => {
-      console.log(err);
-      res.status(500).send("Error updating users database");
+      if ((err.code = "ERR_DUP_ENTRY")) {
+        res.status(500).send(`The user with email: ${email} already exists`);
+      } else {
+        console.log(err);
+        res.status(500).send("Error updating users database");
+      }
     });
 };
 
