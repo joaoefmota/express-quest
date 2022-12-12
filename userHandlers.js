@@ -24,10 +24,11 @@ const getUsers = (req, res) => {
   database
     .query(
       where.reduce(
-        (sql, { column, operator }, index) => `${sql} ${index === 0 ? "WHERE" : "AND"} ${column} ${operator} ?`,
-        initialSql,
+        (sql, { column, operator }, index) =>
+          `${sql} ${index === 0 ? "WHERE" : "AND"} ${column} ${operator} ?`,
+        initialSql
       ),
-      where.map(({ value }) => value),
+      where.map(({ value }) => value)
     )
 
     .then(([users]) => {
@@ -72,11 +73,12 @@ const getUserById = (req, res) => {
 };
 
 const postUser = (req, res) => {
-  const { firstname, lastname, email, city, language } = req.body;
+  const { firstname, lastname, email, city, language, hashedPassword } =
+    req.body;
   database
     .query(
-      "INSERT INTO users (firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
-      [firstname, lastname, email, city, language]
+      "INSERT INTO users (firstname, lastname, email, city, language, hashedPassword) VALUES (?, ?, ?, ?, ?, ?)",
+      [firstname, lastname, email, city, language, hashedPassword]
     )
     .then(([result]) => {
       res.location(`./api/users/${result.insertId}`).sendStatus(201);
@@ -113,14 +115,15 @@ const putUsers = (req, res) => {
 };
 
 const deleteUser = (req, res) => {
-  const id = praseInt(req.params.id);
+  const id = parseInt(req.params.id);
+  
   database
     .query("DELETE FROM users WHERE id=?", [id])
     .then(([result]) => {
       if (result.affectedRows === 0) {
         res.status(404).send("Not found");
       } else {
-        res.status(204);
+        res.status(204).send("User deleted");
       }
     })
     .catch((err) => {

@@ -22,18 +22,19 @@ app.use(express.json());
 app.get("/", welcome);
 
 const movieHandlers = require("./movieHandlers");
+const { hashPassword } = require("./auth");
 
 app.get("/api/movies", movieHandlers.getMovies);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
 app.post("/api/movies", validateMovie, movieHandlers.postMovie);
 app.put("/api/movies/:id", validateMovie, movieHandlers.putMovie);
-app.delete("/api/movies", movieHandlers.deleteMovie);
+app.delete("/api/movies/:id", movieHandlers.deleteMovie);
 
 app.get("/api/users", userHandlers.getUsers);
 app.get("/api/users/:id", userHandlers.getUserById);
-app.post("/api/users", validateUser, userHandlers.postUser);
+app.post("/api/users", [hashPassword, validateUser], userHandlers.postUser);
 app.put("/api/users/:id", validateUser, userHandlers.putUsers);
-app.delete("/api/users", userHandlers.deleteUser);
+app.delete("/api/users/:id", userHandlers.deleteUser);
 
 app.listen(port, (err) => {
   if (err) {
