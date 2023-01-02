@@ -6,6 +6,8 @@ const app = express();
 const port = process.env.APP_PORT ?? 5000; // default port in case APP_PORT doesn't work
 const { validateMovie, validateUser } = require("./validators");
 const userHandlers = require("./userHandlers");
+const { hashPassword, verifyPassword, verifyToken } = require("./auth");
+const movieHandlers = require("./movieHandlers");
 
 const welcome = (req, res) => {
   res.send("Welcome to my favourite movie list");
@@ -21,18 +23,32 @@ app.use(express.json());
 
 app.get("/", welcome);
 
-const movieHandlers = require("./movieHandlers");
-const { hashPassword } = require("./auth");
+// LOGIN ROUTE
+
+app.post(
+  "/api/login",
+  userHandlers.getUserByEmailWithPasswordAndPassToNext,
+  verifyPassword // /!\ login should be a public route
+);
+
+// The public Routes
 
 app.get("/api/movies", movieHandlers.getMovies);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
-app.post("/api/movies", validateMovie, movieHandlers.postMovie);
-app.put("/api/movies/:id", validateMovie, movieHandlers.putMovie);
-app.delete("/api/movies/:id", movieHandlers.deleteMovie);
+
 
 app.get("/api/users", userHandlers.getUsers);
 app.get("/api/users/:id", userHandlers.getUserById);
 app.post("/api/users", [hashPassword, validateUser], userHandlers.postUser);
+
+// The Routes to Protect
+
+app.use(verifyToken); // authentication wall : verifyToken is activated for each route after this line
+
+app.post("/api/movies", validateMovie, movieHandlers.postMovie);
+app.put("/api/movies/:id", validateMovie, movieHandlers.putMovie);
+app.delete("/api/movies/:id", movieHandlers.deleteMovie);
+
 app.put("/api/users/:id", validateUser, userHandlers.putUsers);
 app.delete("/api/users/:id", userHandlers.deleteUser);
 
@@ -45,3 +61,15 @@ app.listen(port, (err) => {
     console.log(`Server is listening on ${port}`);
   }
 });
+
+// Test for password validation
+// const isItDwight = (req, res) => {
+//   if (
+//     req.body.email === "dwight@theoffice.com" &&
+//     req.body.password === "123456"
+//   ) {
+//     res.send("Credentials are valid");
+//   } else {
+//     res.sendStatus(401);
+//   }
+// };
