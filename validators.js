@@ -47,7 +47,6 @@ const validateMovie = (req, res, next) => {
 
 const validateUser = (req, res, next) => {
   const { firstname, lastname, email, city, language } = req.body;
-  const { payload } = req.payload.sub;
   const { error } = userSchema.validate(
     { firstname, lastname, email, city, language },
     { abortEarly: false }
@@ -55,8 +54,6 @@ const validateUser = (req, res, next) => {
 
   if (error) {
     res.status(422).json({ validationErrors: error.details });
-  } else if (!payload) {
-    res.status(403).send("Forbidden");
   } else {
     next();
   }

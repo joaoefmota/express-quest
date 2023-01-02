@@ -95,6 +95,12 @@ const postUser = (req, res) => {
 
 const putUsers = (req, res) => {
   const id = parseInt(req.params.id);
+
+  if (req.payload.sub !== id) {
+    res.status(403).send("Forbidden");
+    return;
+  }
+
   const { firstname, lastname, email, city, language } = req.body;
   database
     .query(
@@ -116,6 +122,11 @@ const putUsers = (req, res) => {
 
 const deleteUser = (req, res) => {
   const id = parseInt(req.params.id);
+  
+  if (req.payload.sub !== id) {
+    res.status(403).send("Forbidden");
+    return;
+  }
 
   database
     .query("DELETE FROM users WHERE id=?", [id])
